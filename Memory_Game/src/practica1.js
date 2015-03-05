@@ -1,3 +1,7 @@
+/*
+* Samuel García Segador
+*/
+
 var MemoryGame;
 
 StatesCards = {
@@ -6,6 +10,9 @@ StatesCards = {
 		found:2
 };
 
+/*
+* Constructora de Memory Game
+*/
 MemoryGame = function (gs){
 	//Probar a poner var delante
 	this.gs = gs;
@@ -21,9 +28,15 @@ MemoryGame = function (gs){
 	}
 }
 
-
+/*
+* Métodos de de la clase Memory Game
+*/
 MemoryGame.prototype = {
 
+	/*
+	* Inicializa el Juego creando las cartas, desordenandolas y llamando al bucle
+	* principal del juego.
+	*/
 	initGame: function(){
 		for (i = 0, j = 0; i < this.allCards.length;i++, j+=2){
 			this.stateGame.cardsOnTheTable[j]   = new MemoryGame.Card(this.allCards[i]);
@@ -39,10 +52,17 @@ MemoryGame.prototype = {
 		this.loop();
 	},
 
+	/*
+	* Indica si el juego ha acabado o no, es decir, cuando todas las parejas estén levantadas.
+	*/
 	finishGame: function(){
 		return this.stateGame.pairs == 0;
 	},
 
+	/*
+	* Dibuja las cartas en el tablero dependiendo del estado en el que se encuentre la carta y
+	* Comprobamos si el juego ha acabado.
+	*/
 	draw: function(){
 		if (this.finishGame()){
 			this.message = "You win!!"
@@ -54,13 +74,23 @@ MemoryGame.prototype = {
 		}	
 	},
 
+	/*
+	* Llamamos cada 16 ms (60 FPS) a la funcion draw para que dibuje las cartas en el tablero.
+	*/
 	loop: function(){
 		var that = this;
-		this.stateGame.refreshIntervalId = setInterval(function () {that.draw.call(that)}, 16); //60fpss
+		this.stateGame.refreshIntervalId = setInterval(function () {that.draw.call(that)}, 16);
 	},
 
+	clickOnCard: function(CardId){
+		return CardId >= 0 && CardId != null;
+	},
+
+	/*
+	* Comprobamos si las dos cartas levantadas son la misma o no.
+	*/
 	onClick: function(CardId){
-		if (this.stateGame.cardsOnTheTable[CardId].stateCard != StatesCards.found && !this.stateGame.busy){
+		if ( this.clickOnCard(CardId) && this.stateGame.cardsOnTheTable[CardId].stateCard != StatesCards.found && !this.stateGame.busy){
 			if (this.stateGame.lastCard == null){
 				this.stateGame.lastCard = this.stateGame.cardsOnTheTable[CardId];
 				this.stateGame.cardsOnTheTable[CardId].flip();
@@ -93,13 +123,22 @@ MemoryGame.prototype = {
 
 }
 
+/*
+* Constructor de Card
+*/
 MemoryGame.Card = function(sprite){
 	this.spriteName = sprite;
 	this.stateCard = StatesCards.back;
 }
 
+/*
+* Métodos de la clase Card.
+*/
 MemoryGame.Card.prototype = {
 
+	/*
+	* Voltear la carta de boca abajo a boca arriba y viceversa
+	*/
 	flip: function(){
 		if (this.stateCard == StatesCards.back){
 			this.stateCard = StatesCards.flopCard;
@@ -109,14 +148,23 @@ MemoryGame.Card.prototype = {
 		}
 	},
 
+	/*
+	* Pone la carta como encontrada.
+	*/
 	found: function(){
 		this.stateCard = StatesCards.found;
 	},
 
+	/*
+	* Compara si los sprites de las cartas son iguales.
+	*/
 	compareTo: function(otherCard){
 		return this.spriteName == otherCard.spriteName;
 	},
 
+	/*
+	* Dibuja una carta en el tablero.
+	*/
 	draw: function(gs, pos){
 		if (this.stateCard == StatesCards.back){
 			gs.draw("back", pos);
